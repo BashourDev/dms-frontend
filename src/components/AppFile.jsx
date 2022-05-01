@@ -2,8 +2,32 @@ import React from "react";
 import { ContextMenu, ContextMenuTrigger, MenuItem } from "react-contextmenu";
 import { FaFile } from "react-icons/fa";
 import { MdDelete, MdEdit, MdLock } from "react-icons/md";
+import { toast } from "react-toastify";
+import api from "../api/api";
+import { conf } from "./appConfirm";
 
-const AppFile = ({ id, name }) => {
+const AppFile = ({ id, name, setFSEs, setSelectedFile, setIsEditOpen }) => {
+  const handleEdit = () => {
+    setSelectedFile(id);
+    setIsEditOpen(true);
+  };
+
+  const handleDelete = async () => {
+    let result = await conf(" هل أنت متأكد من حذف الملف " + name + "؟");
+
+    if (!result) {
+      return;
+    }
+
+    try {
+      await api.delete(`/documents/${id}/delete`);
+      toast.success("تمت العملية بنجاح");
+      setFSEs((old) => old.filter((fse) => fse.id !== id));
+    } catch (error) {
+      toast.error("حدث خطأ");
+    }
+  };
+
   return (
     <>
       <ContextMenuTrigger id={"" + id}>
@@ -21,7 +45,7 @@ const AppFile = ({ id, name }) => {
       >
         <MenuItem
           data={{ foo: "bar" }}
-          onClick={() => console.log("sss")}
+          onClick={() => handleEdit()}
           className="flex items-center cursor-pointer hover:bg-light px-2 py-1"
         >
           <MdEdit className="text-info text-lg ml-2" />
@@ -30,7 +54,7 @@ const AppFile = ({ id, name }) => {
         <MenuItem divider className="cursor-pointer bg-lightGray h-[1px]" />
         <MenuItem
           data={{ foo: "bar" }}
-          onClick={() => console.log("sss")}
+          onClick={() => handleDelete()}
           className="flex items-center cursor-pointer hover:bg-light px-2 py-1"
         >
           <MdDelete className="text-danger text-lg ml-2" />

@@ -14,17 +14,16 @@ import AppFileInput from "../AppFileInput";
 import { Form, Formik } from "formik";
 
 const validationSchema = Yup.object().shape({
-  // name: Yup.string().required("لا يمكن أن يكون حقل الاسم فارغ"),
+  name: Yup.string().required("لا يمكن أن يكون حقل الاسم فارغ"),
 });
 
-const FileAdd = ({ isOpen, setIsOpen, setFSEs, parent }) => {
+const FileEdit = ({ isOpen, setIsOpen, setFSEs, parent, selectedFile }) => {
   const [isUpdating, setIsUpdating] = useState(false);
-  const [selectedFile, setSelectedFile] = useState("");
-  const [fileName, setFileName] = useState("");
+  //   const [fileName, setFileName] = useState("");
   const [categories, setCategories] = useState([]);
-  const [fileNameError, setFileNameError] = useState("");
+  //   const [fileNameError, setFileNameError] = useState("");
   const [initialValues, setInitialValues] = useState({
-    // name: "",
+    name: "",
     category: { id: 0, name: "---", custom_path: "---" },
     due_date: "",
     require_approval: false,
@@ -37,67 +36,103 @@ const FileAdd = ({ isOpen, setIsOpen, setFSEs, parent }) => {
     setCategories(res.data);
   };
 
+  const getFile = async () => {
+    if (selectedFile === 0) {
+      return;
+    }
+    const res = await api.get(`/documents/${selectedFile}/show`);
+
+    setInitialValues({
+      ...res.data,
+      require_approval: res.data.group_approval_id ? true : false,
+      category: res.data.category
+        ? res.data.category
+        : { id: 0, name: "---", custom_path: "---" },
+      group_approval_id: res.data.group_approval
+        ? res.data.group_approval
+        : { id: 0, name: "---" },
+    });
+  };
+
   useEffect(() => {
     getCategories();
   }, []);
 
   useEffect(() => {
-    setFileName(selectedFile?.name);
+    getFile();
   }, [selectedFile]);
 
-  useEffect(() => {
-    setInitialValues({
-      // name: "",
-      category: { id: 0, name: "---", custom_path: "---" },
-      due_date: "",
-      require_approval: false,
-      group_approval_id: { id: 0, name: "---" },
-      is_directory: false,
-    });
-    setFileName("");
-    setFileNameError("");
-  }, [isOpen]);
+  //   useEffect(() => {
+  //     setFileName(selectedFile?.name);
+  //   }, [selectedFile]);
 
-  useEffect(() => {
-    if (!fileName) {
-      setFileNameError("لا يمكن أن يكون حقل الاسم فارغ");
-      return;
-    } else {
-      setFileNameError("");
-    }
-  }, [fileName]);
+  //   useEffect(() => {
+  //     setInitialValues({
+  //       // name: "",
+  //       category: { id: 0, name: "---" },
+  //       due_date: "",
+  //       require_approval: false,
+  //       group_approval_id: { id: 0, name: "---" },
+  //       is_directory: false,
+  //     });
+  //     setFileName("");
+  //   }, [isOpen]);
+
+  //   useEffect(() => {
+  //     if (!fileName) {
+  //       setFileNameError("لا يمكن أن يكون حقل الاسم فارغ");
+  //       return;
+  //     } else {
+  //       setFileNameError("");
+  //     }
+  //   }, [fileName]);
 
   const handleSubmit = async (values) => {
-    if (!fileName) {
-      setFileNameError("لا يمكن أن يكون حقل الاسم فارغ");
-      return;
-    } else {
-      setFileNameError("");
-    }
+    // if (!fileName) {
+    //   setFileNameError("لا يمكن أن يكون حقل الاسم فارغ");
+    //   return;
+    // } else {
+    //   setFileNameError("");
+    // }
     setIsUpdating(true);
 
-    let formData = new FormData();
-    formData.append("name", fileName);
-    formData.append(
-      "category",
-      values.category.id === 0 ? "" : values.category.id
-    );
-    formData.append("due_date", values.due_date);
-    formData.append(
-      "group_approval_id",
-      values.group_approval_id.id === 0 ? "" : values.group_approval_id.id
-    );
-    formData.append("is_directory", 0);
-    formData.append("attachment", selectedFile);
+    // let formData = new FormData();
+    // formData.append("name", values.name);
+    // formData.append(
+    //   "category",
+    //   values.category.id === 0 ? "" : values.category.id
+    // );
+    // formData.append("due_date", values.due_date);
+    // formData.append(
+    //   "group_approval_id",
+    //   values.group_approval_id.id === 0 ? "" : values.group_approval_id.id
+    // );
+    // formData.append("is_directory", 0);
     try {
-      const res = await api.post(`/documents/${parent}/create`, formData);
+      await api.put(`/documents/${selectedFile}/update`, {
+        name: values.name,
+        category: values.category.id === 0 ? "" : values.category.id,
+        due_date: values.due_date,
+        group_approval_id:
+          values.group_approval_id.id === 0 ? "" : values.group_approval_id.id,
+        is_directory: false,
+      });
       onClose();
       toast.success("تمت العملية بنجاح");
       if (setFSEs) {
-        setFSEs((old) => [{ ...res.data, is_directory: false }, ...old]);
+        setFSEs((old) =>
+          old.map((fse) => {
+            if (fse.id === selectedFile) {
+              fse.name = values.name;
+            }
+            return fse;
+          })
+        );
       }
-    } catch (error) {}
-    setIsUpdating(false);
+    } catch (error) {
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   const onClose = () => {
@@ -105,7 +140,7 @@ const FileAdd = ({ isOpen, setIsOpen, setFSEs, parent }) => {
   };
 
   return (
-    <AppModal isOpen={isOpen} onClose={onClose} title={"إضافة ملف"}>
+    <AppModal isOpen={isOpen} onClose={onClose} title={"تعديل ملف"}>
       <Formik
         enableReinitialize
         initialValues={initialValues}
@@ -114,38 +149,12 @@ const FileAdd = ({ isOpen, setIsOpen, setFSEs, parent }) => {
       >
         {({ values }) => (
           <>
-            <AppFileInput
-              label={"اختر ملف"}
-              selectedFile={selectedFile}
-              onChange={(e) => setSelectedFile(e.target.files[0])}
+            <AppFormInput
+              id={"name"}
+              placeholder={"الإسم"}
+              label={"الإسم:"}
+              containerClassName="grow"
             />
-            <div className={`flex flex-col`}>
-              <label
-                htmlFor={"name"}
-                className="text-dark text-xs lg:text-sm focus:text-primary mt-5 mb-1 mx-1 focus-within:text-primary"
-              >
-                الإسم
-              </label>
-              <div
-                className={`w-full h-11 border-[1px] border-lightGray transition duration-150 rounded-lg flex items-center text-dark focus-within:border-primary ${
-                  fileNameError && "border-danger"
-                }`}
-              >
-                <div className="px-2"></div>
-                <input
-                  type={"text"}
-                  value={fileName}
-                  placeholder={"ادخل اسم الملف أو قم بتحديده"}
-                  onChange={(e) => setFileName(e.target.value)}
-                  className="border-0 outline-none px-2 w-full bg-inherit text-xs lg:text-sm"
-                />
-              </div>
-              {fileNameError !== "" && (
-                <p className="text-danger mt-1 text-xs lg:text-sm">
-                  {fileNameError}
-                </p>
-              )}
-            </div>
             <AppFormInput
               id={"due_date"}
               placeholder={"تاريخ الانتهاء"}
@@ -192,4 +201,4 @@ const FileAdd = ({ isOpen, setIsOpen, setFSEs, parent }) => {
   );
 };
 
-export default FileAdd;
+export default FileEdit;

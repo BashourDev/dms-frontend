@@ -4,7 +4,12 @@ import { Listbox, Transition } from "@headlessui/react";
 import { MdCheck, MdChevronLeft } from "react-icons/md";
 import { useFormikContext } from "formik";
 
-export default function AppFormSelect({ name, label, options }) {
+export default function AppFormSelect({
+  name,
+  label,
+  options,
+  displayedName = "name",
+}) {
   const { setFieldTouched, handleChange, setFieldValue, values } =
     useFormikContext();
 
@@ -13,16 +18,16 @@ export default function AppFormSelect({ name, label, options }) {
   // }, []);
 
   return (
-    <div className="flex flex-col text-dark text-xs lg:text-sm mt-5 mb-1 w-full">
+    <div className="flex flex-col text-dark text-xs mt-5 mb-1 w-full">
       <label>{label}</label>
       <Listbox
-        value={values[name].name}
+        value={values[name][displayedName]}
         onChange={(v) => setFieldValue(name, v)}
       >
         <div className="relative mt-1">
           <Listbox.Button className="relative w-full py-2 pr-6 pl-10 text-left bg-inherit border-[1px] border-lightGray rounded-lg shadow-md cursor-default focus:outline-none focus-visible:ring-2 focus-visible:ring-opacity-75 focus-visible:ring-white focus-visible:ring-offset-sky-300 focus-visible:ring-offset-2 focus-visible:border-indigo-500 sm:text-sm">
             <span className="block truncate text-right">
-              {values[name].name}
+              {values[name][displayedName]}
             </span>
             <span className="absolute inset-y-0 left-0 flex items-center pl-2 pointer-events-none">
               <MdChevronLeft
@@ -37,7 +42,7 @@ export default function AppFormSelect({ name, label, options }) {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Listbox.Options className="absolute z-50 w-full py-1 mt-1 overflow-auto text-xs lg:text-sm bg-white rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+            <Listbox.Options className="absolute z-50 w-full py-1 mt-1 overflow-auto bg-white rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none text-xs">
               {options.map((option, personIdx) => (
                 <Listbox.Option
                   key={personIdx}
@@ -55,7 +60,7 @@ export default function AppFormSelect({ name, label, options }) {
                           selected ? "font-medium" : "font-normal"
                         }`}
                       >
-                        {option.name}
+                        {option[displayedName]}
                       </span>
                       {selected ? (
                         <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-sky-700">
