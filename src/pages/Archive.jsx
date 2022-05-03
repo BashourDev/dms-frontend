@@ -8,8 +8,10 @@ import AppFolder from "../components/AppFolder";
 import Loading from "../components/Loading";
 import FileAdd from "../components/Modals/FileAdd";
 import FileEdit from "../components/Modals/FileEdit";
+import FileVersions from "../components/Modals/FileVersions";
 import FolderAdd from "../components/Modals/FolderAdd";
 import FolderEdit from "../components/Modals/FolderEdit";
+import FSEPermissions from "../components/Modals/FSEPermissions";
 
 const Archive = () => {
   const [archive, setArchive] = useState([]);
@@ -22,11 +24,14 @@ const Archive = () => {
   const [selectedFile, setSelectedFile] = useState(0);
   const [selectedFolder, setSelectedFolder] = useState(0);
   const [isDnDOpen, setIsDnDOpen] = useState(false);
+  const [isVersionsOpen, setIsVersionsOpen] = useState(false);
+  const [isPermissionsOpen, setIsPermissionsOpen] = useState(false);
 
   const getDocuments = async (par = 1) => {
     setIsLoading(true);
     try {
       const res = await api.get(`/documents/${par}`);
+      console.log(res);
       setArchive(res.data.documents);
       setParent(res.data.parent);
     } catch (error) {
@@ -112,6 +117,8 @@ const Archive = () => {
                 setIsEditOpen={setIsFolderEditOpen}
                 setSelectedFolder={setSelectedFolder}
                 getDocuments={getDocuments}
+                setIsPermissionsOpen={setIsPermissionsOpen}
+                setSelectedFile={setSelectedFile}
               />
             ) : (
               <AppFile
@@ -121,6 +128,8 @@ const Archive = () => {
                 setFSEs={setArchive}
                 setSelectedFile={setSelectedFile}
                 setIsEditOpen={setIsFileEditOpen}
+                setIsVersionsOpen={setIsVersionsOpen}
+                setIsPermissionsOpen={setIsPermissionsOpen}
               />
             )
           )
@@ -139,6 +148,11 @@ const Archive = () => {
         parent={parent}
         selectedFile={selectedFile}
       />
+      <FileVersions
+        isOpen={isVersionsOpen}
+        setIsOpen={setIsVersionsOpen}
+        selectedFile={selectedFile}
+      />
       <FolderAdd
         isOpen={isFolderAddOpen}
         setIsOpen={setIsFolderAddOpen}
@@ -150,6 +164,11 @@ const Archive = () => {
         setIsOpen={setIsFolderEditOpen}
         selectedFolder={selectedFolder}
         setFSEs={setArchive}
+      />
+      <FSEPermissions
+        isOpen={isPermissionsOpen}
+        setIsOpen={setIsPermissionsOpen}
+        selectedFile={selectedFile}
       />
     </div>
   );

@@ -1,12 +1,20 @@
 import React from "react";
 import { ContextMenu, ContextMenuTrigger, MenuItem } from "react-contextmenu";
-import { FaFile } from "react-icons/fa";
+import { FaFile, FaFileArchive } from "react-icons/fa";
 import { MdDelete, MdEdit, MdLock } from "react-icons/md";
 import { toast } from "react-toastify";
 import api from "../api/api";
 import { conf } from "./appConfirm";
 
-const AppFile = ({ id, name, setFSEs, setSelectedFile, setIsEditOpen }) => {
+const AppFile = ({
+  id,
+  name,
+  setFSEs,
+  setSelectedFile,
+  setIsEditOpen,
+  setIsVersionsOpen,
+  setIsPermissionsOpen,
+}) => {
   const handleEdit = () => {
     setSelectedFile(id);
     setIsEditOpen(true);
@@ -26,6 +34,16 @@ const AppFile = ({ id, name, setFSEs, setSelectedFile, setIsEditOpen }) => {
     } catch (error) {
       toast.error("حدث خطأ");
     }
+  };
+
+  const handleAllVersions = () => {
+    setSelectedFile(id);
+    setIsVersionsOpen(true);
+  };
+
+  const handlePermissions = () => {
+    setSelectedFile(id);
+    setIsPermissionsOpen(true);
   };
 
   return (
@@ -63,7 +81,16 @@ const AppFile = ({ id, name, setFSEs, setSelectedFile, setIsEditOpen }) => {
         <MenuItem divider className="cursor-pointer bg-lightGray h-[1px]" />
         <MenuItem
           data={{ foo: "bar" }}
-          onClick={() => console.log("sss")}
+          onClick={() => handleAllVersions()}
+          className="flex items-center cursor-pointer hover:bg-light px-2 py-1"
+        >
+          <FaFileArchive className="text-dark text-lg ml-2" />
+          <span>جميع النسخ</span>
+        </MenuItem>
+        <MenuItem divider className="cursor-pointer bg-lightGray h-[1px]" />
+        <MenuItem
+          data={{ foo: "bar" }}
+          onClick={() => handlePermissions()}
           className="flex items-center cursor-pointer hover:bg-light px-2 py-1"
         >
           <MdLock className="text-dark text-lg ml-2" />

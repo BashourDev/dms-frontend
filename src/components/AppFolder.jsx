@@ -13,6 +13,8 @@ const AppFolder = ({
   setFSEs,
   setSelectedFolder,
   setIsEditOpen,
+  setIsPermissionsOpen,
+  setSelectedFile,
 }) => {
   const handleDoubleClick = async () => {
     getDocuments(id);
@@ -37,6 +39,11 @@ const AppFolder = ({
     } catch (error) {
       toast.error("حدث خطأ");
     }
+  };
+
+  const handlePermissions = () => {
+    setSelectedFile(id);
+    setIsPermissionsOpen(true);
   };
 
   return (
@@ -76,7 +83,7 @@ const AppFolder = ({
         <MenuItem divider className="cursor-pointer bg-lightGray h-[1px]" />
         <MenuItem
           data={{ foo: "bar" }}
-          onClick={() => console.log("sss")}
+          onClick={() => handlePermissions()}
           className="flex items-center cursor-pointer hover:bg-light px-2 py-1"
         >
           <MdLock className="text-dark text-lg ml-2" />
