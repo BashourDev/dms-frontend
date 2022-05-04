@@ -13,24 +13,39 @@ import { MdDelete } from "react-icons/md";
 import AppSelect from "../AppSelect";
 import { conf } from "../appConfirm";
 import AppUserSelect from "../AppUserSelect";
+import Loading from "../Loading";
 
 const GroupUsers = ({ group, isOpen, setIsOpen }) => {
+  const [isLoading, setisLoading] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [users, setUsers] = useState([]);
   const [availableUsers, setAvailableUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState({ id: 0, username: "---" });
 
   const getGroupUsers = async () => {
-    const res = await api.get(`/groups/${group.id}/users`);
-    setUsers(res.data);
-    console.log("res", res);
+    try {
+      setisLoading(true);
+      const res = await api.get(`/groups/${group.id}/users`);
+      setUsers(res.data);
+    } catch (error) {
+      toast.error("حدث خطأ");
+    } finally {
+      setisLoading(false);
+    }
   };
 
   const getGroupAvailableUsers = async () => {
-    const res = await api.get(`/groups/${group.id}/users/available`);
-    setAvailableUsers(res.data);
-    if (res.data.length > 0) {
-      setSelectedUser(res?.data[0]);
+    try {
+      setisLoading(true);
+      const res = await api.get(`/groups/${group.id}/users/available`);
+      setAvailableUsers(res.data);
+      if (res.data.length > 0) {
+        setSelectedUser(res?.data[0]);
+      }
+    } catch (error) {
+      toast.error("حدث خطأ");
+    } finally {
+      setisLoading(false);
     }
   };
 
@@ -40,11 +55,11 @@ const GroupUsers = ({ group, isOpen, setIsOpen }) => {
       getGroupAvailableUsers();
     }
 
-    return () => {
-      setUsers([]);
-      setAvailableUsers([]);
-    };
-  }, [group, isOpen]);
+    // return () => {
+    //   setUsers([]);
+    //   setAvailableUsers([]);
+    // };
+  }, [isOpen]);
 
   const handleDelete = async (user) => {
     let result = await conf("هل أنت متأكد من إزالة المستخدم من المجموعة؟");
@@ -58,23 +73,23 @@ const GroupUsers = ({ group, isOpen, setIsOpen }) => {
       setAvailableUsers((old) => [...old, user]);
       toast.success("تمت العملية بنجاح");
     } catch (error) {
-      console.log(error);
+      toast.error("حدث خطأ");
     }
   };
 
   const handleAdd = async () => {
     setIsUpdating(true);
     try {
-      const res = await api.post(
-        `/groups/${selectedUser.id}/groups/add/${group?.id}`,
-        {}
-      );
-      console.log(res);
+      await api.post(`/groups/${selectedUser.id}/groups/add/${group?.id}`, {});
       setUsers((old) => [...old, selectedUser]);
       setAvailableUsers((old) => old.filter((o) => o.id !== selectedUser.id));
+      setSelectedUser({ id: 0, username: "---" });
       toast.success("تمت العملية بنجاح");
-    } catch (error) {}
-    setIsUpdating(false);
+    } catch (error) {
+      toast.error("حدث خطأ");
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   const onClose = () => {
@@ -96,11 +111,13 @@ const GroupUsers = ({ group, isOpen, setIsOpen }) => {
           disabled={selectedUser.id === 0}
           className={`rounded-full transition duration-100 w-20 h-8 lg:h-11 mt-10 mb-1 bg-inherit border-4 text-primary hover:bg-primary hover:text-white text-xs lg:text-sm border-primary`}
         >
-          إضافة
+          {isUpdating ? <Loading className="w-8 h-8" /> : "إضافة"}
         </button>
       </div>
       <div className="flex flex-col w-full space-y-2 h-64 py-2">
-        {users.length > 0 ? (
+        {isLoading ? (
+          <Loading />
+        ) : users.length > 0 ? (
           users.map((user) => (
             <div
               key={user?.id}

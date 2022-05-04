@@ -20,33 +20,7 @@ const validationSchema = Yup.object().shape({
 const FSEPermissions = ({ isOpen, setIsOpen, selectedFile }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [groups, setGroups] = useState([
-    {
-      id: 1,
-      name: "blah",
-      pivot: { read: 1, upload: 1, download: 1, delete: 1 },
-    },
-    {
-      id: 2,
-      name: "blah",
-      pivot: { read: 1, upload: 1, download: 1, delete: 1 },
-    },
-    {
-      id: 3,
-      name: "blah",
-      pivot: { read: 1, upload: 1, download: 1, delete: 1 },
-    },
-    {
-      id: 4,
-      name: "blah",
-      pivot: { read: 1, upload: 1, download: 1, delete: 1 },
-    },
-    {
-      id: 5,
-      name: "blah",
-      pivot: { read: 1, upload: 1, download: 1, delete: 1 },
-    },
-  ]);
+  const [groups, setGroups] = useState([]);
 
   const [availableGroups, setAvailableGroups] = useState([]);
   const [newGroups, setNewGroups] = useState([]);
@@ -74,7 +48,7 @@ const FSEPermissions = ({ isOpen, setIsOpen, selectedFile }) => {
     }
     try {
       setIsLoading(true);
-      const res = await api.get(`/groups`);
+      const res = await api.get(`/documents/${selectedFile}/linkable-groups`);
       setAvailableGroups(res.data);
     } catch (error) {
     } finally {
@@ -153,8 +127,6 @@ const FSEPermissions = ({ isOpen, setIsOpen, selectedFile }) => {
           delete: ug?.pivot?.delete,
         });
       });
-
-      console.log(updated_groups);
 
       await api.post(
         `/documents/${selectedFile}/manipulate-groups-and-permissions`,

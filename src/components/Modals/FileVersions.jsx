@@ -15,9 +15,10 @@ const validationSchema = Yup.object().shape({
   // name: Yup.string().required("لا يمكن أن يكون حقل الاسم فارغ"),
 });
 
-const FileVersions = ({ isOpen, setIsOpen, selectedFile }) => {
+const FileVersions = ({ isOpen, setIsOpen, selectedFile, permissions }) => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [file, setFile] = useState({ media: [] });
+  const userContext = useContext(UserContext);
 
   const getVersions = async () => {
     if (selectedFile === 0) {
@@ -60,7 +61,6 @@ const FileVersions = ({ isOpen, setIsOpen, selectedFile }) => {
       responseType: "blob",
     });
     FileDownload(res.data, name);
-    // console.log(res.data);
   };
 
   const onClose = () => {
@@ -78,14 +78,18 @@ const FileVersions = ({ isOpen, setIsOpen, selectedFile }) => {
               {moment(v?.created_at).calendar()}
             </p>
             <div className="flex justify-around w-full pt-2">
-              <MdDownload
-                onClick={() => handleDownload(v?.id, v?.file_name)}
-                className="text-xl text-primary cursor-pointer"
-              />
-              <MdDelete
-                onClick={() => handleDelete(v?.id)}
-                className="text-xl text-danger cursor-pointer"
-              />
+              {userContext?.user?.is_admin || permissions?.download ? (
+                <MdDownload
+                  onClick={() => handleDownload(v?.id, v?.file_name)}
+                  className="text-xl text-primary cursor-pointer"
+                />
+              ) : null}
+              {userContext?.user?.is_admin || permissions?.delete ? (
+                <MdDelete
+                  onClick={() => handleDelete(v?.id)}
+                  className="text-xl text-danger cursor-pointer"
+                />
+              ) : null}
             </div>
           </div>
         ))}

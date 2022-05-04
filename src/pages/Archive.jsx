@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
 import { FiFilePlus, FiFolderPlus } from "react-icons/fi";
 import { MdChevronRight } from "react-icons/md";
@@ -12,6 +12,7 @@ import FileVersions from "../components/Modals/FileVersions";
 import FolderAdd from "../components/Modals/FolderAdd";
 import FolderEdit from "../components/Modals/FolderEdit";
 import FSEPermissions from "../components/Modals/FSEPermissions";
+import UserContext from "../contexts/userContext";
 
 const Archive = () => {
   const [archive, setArchive] = useState([]);
@@ -26,12 +27,13 @@ const Archive = () => {
   const [isDnDOpen, setIsDnDOpen] = useState(false);
   const [isVersionsOpen, setIsVersionsOpen] = useState(false);
   const [isPermissionsOpen, setIsPermissionsOpen] = useState(false);
+  const [selectedFSEPermissions, setSelectedFSEPermissions] = useState({});
+  const userContext = useContext(UserContext);
 
   const getDocuments = async (par = 1) => {
     setIsLoading(true);
     try {
       const res = await api.get(`/documents/${par}`);
-      console.log(res);
       setArchive(res.data.documents);
       setParent(res.data.parent);
     } catch (error) {
@@ -59,9 +61,6 @@ const Archive = () => {
   };
 
   const handleFilesUpload = (files) => {
-    console.log("====================================");
-    console.log(files);
-    console.log("====================================");
     setIsDnDOpen(false);
   };
 
@@ -101,7 +100,7 @@ const Archive = () => {
           />
         </div>
       )}
-      <div className="flex flex-wrap gap-7 lg:gap-10 px-3 lg:px-20 py-10">
+      <div className="flex justify-center sm:justify-start flex-wrap gap-7 lg:gap-10 px-3 lg:px-20 pt-10 pb-28 md:pb-10">
         {isLoading ? (
           <Loading />
         ) : !archive.length ? (
@@ -119,6 +118,9 @@ const Archive = () => {
                 getDocuments={getDocuments}
                 setIsPermissionsOpen={setIsPermissionsOpen}
                 setSelectedFile={setSelectedFile}
+                permissions={
+                  !userContext?.user?.is_admin ? ar?.permissions[0] : {}
+                }
               />
             ) : (
               <AppFile
@@ -130,6 +132,11 @@ const Archive = () => {
                 setIsEditOpen={setIsFileEditOpen}
                 setIsVersionsOpen={setIsVersionsOpen}
                 setIsPermissionsOpen={setIsPermissionsOpen}
+                media={ar?.media}
+                permissions={
+                  !userContext?.user?.is_admin ? ar?.permissions[0] : {}
+                }
+                setSelectedFilePermissions={setSelectedFSEPermissions}
               />
             )
           )
@@ -152,6 +159,7 @@ const Archive = () => {
         isOpen={isVersionsOpen}
         setIsOpen={setIsVersionsOpen}
         selectedFile={selectedFile}
+        permissions={selectedFSEPermissions}
       />
       <FolderAdd
         isOpen={isFolderAddOpen}

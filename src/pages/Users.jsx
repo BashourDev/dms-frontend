@@ -21,9 +21,6 @@ const Users = () => {
   const getUsers = async () => {
     const res = await api.get(`/users?search=${searchText}`);
     setUsers(res.data);
-    console.log("====================================");
-    console.log(res.data);
-    console.log("====================================");
   };
 
   const handleKeyPress = async (e) => {

@@ -40,11 +40,18 @@ const FolderEdit = ({ isOpen, setIsOpen, setFSEs, selectedFolder }) => {
     setIsUpdating(true);
 
     try {
-      const res = await api.post(`/documents/${selectedFolder}/update`, values);
+      const res = await api.put(`/documents/${selectedFolder}/update`, values);
       onClose();
       toast.success("تمت العملية بنجاح");
       if (setFSEs) {
-        setFSEs((old) => [{ ...res.data, is_directory: true }, ...old]);
+        setFSEs((old) =>
+          old.map((fse) => {
+            if (fse.id === selectedFolder) {
+              fse.name = values.name;
+            }
+            return fse;
+          })
+        );
       }
     } catch (error) {}
     setIsUpdating(false);
@@ -55,7 +62,7 @@ const FolderEdit = ({ isOpen, setIsOpen, setFSEs, selectedFolder }) => {
   };
 
   return (
-    <AppModal isOpen={isOpen} onClose={onClose} title={"إضافة مجلد"}>
+    <AppModal isOpen={isOpen} onClose={onClose} title={"تعديل مجلد"}>
       <Formik
         enableReinitialize
         initialValues={initialValues}
@@ -81,7 +88,7 @@ const FolderEdit = ({ isOpen, setIsOpen, setFSEs, selectedFolder }) => {
               >
                 إلغاء
               </AppButton>
-              <AppSubmitButton isLoading={isUpdating}>إضافة</AppSubmitButton>
+              <AppSubmitButton isLoading={isUpdating}>تعديل</AppSubmitButton>
             </div>
           </>
         )}

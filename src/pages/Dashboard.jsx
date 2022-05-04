@@ -107,37 +107,92 @@ const Dashboard = () => {
         </div>
       </div>
       <div className="flex h-full z-10">
-        <ProSidebar
-          rtl
-          collapsed={sideBarCollapsed}
-          collapsedWidth={windowContext.width > 710 ? 80 : 70}
-        >
-          <Menu iconShape="circle">
-            <MenuItem
-              icon={<AiOutlineMenu />}
-              onClick={() => setSideBarCollapsed(!sideBarCollapsed)}
-            ></MenuItem>
-            <MenuItem
-              className={`${checkActiveItem("archive") ? "bg-slate-800" : ""}`}
-              icon={<HiDocumentText />}
-            >
-              <NavLink to={"/dashboard/archive"}>الأرشيف</NavLink>
-            </MenuItem>
-            <MenuItem
-              className={`${checkActiveItem("groups") ? "bg-slate-800" : ""}`}
-              icon={<MdGroup />}
-            >
-              <NavLink to={"/dashboard/groups"}>المجموعات</NavLink>
-            </MenuItem>
-            <MenuItem
-              className={`${checkActiveItem("users") ? "bg-slate-800" : ""}`}
-              icon={<MdPerson />}
-            >
-              <NavLink to={"/dashboard/users"}>المستخدمين</NavLink>
-            </MenuItem>
-          </Menu>
-        </ProSidebar>
+        {userContext?.user?.is_admin ? (
+          <ProSidebar
+            rtl
+            collapsed={sideBarCollapsed}
+            collapsedWidth={windowContext.width > 710 ? 80 : 70}
+            className="hidden md:block"
+          >
+            <Menu iconShape="circle">
+              <MenuItem
+                icon={<AiOutlineMenu />}
+                onClick={() => setSideBarCollapsed(!sideBarCollapsed)}
+              ></MenuItem>
+              <MenuItem
+                className={`${
+                  checkActiveItem("archive") ? "bg-slate-800" : ""
+                }`}
+                icon={<HiDocumentText />}
+              >
+                <NavLink to={"/dashboard/archive"}>الأرشيف</NavLink>
+              </MenuItem>
+
+              <MenuItem
+                className={`${checkActiveItem("groups") ? "bg-slate-800" : ""}`}
+                icon={<MdGroup />}
+              >
+                <NavLink to={"/dashboard/groups"}>المجموعات</NavLink>
+              </MenuItem>
+              <MenuItem
+                className={`${checkActiveItem("users") ? "bg-slate-800" : ""}`}
+                icon={<MdPerson />}
+              >
+                <NavLink to={"/dashboard/users"}>المستخدمين</NavLink>
+              </MenuItem>
+            </Menu>
+          </ProSidebar>
+        ) : null}
+
         <Outlet />
+
+        <div className="fixed bottom-0 z-20 md:hidden flex justify-around items-center w-full h-16 ring-inset ring-2 ring-lightGray/50 shadow-md bg-white">
+          <div className="h-full">
+            <NavLink
+              className={({ isActive }) =>
+                `flex flex-col justify-center items-center h-full transition ${
+                  isActive
+                    ? "text-primary border-t-2 border-t-primary"
+                    : "text-dark"
+                }`
+              }
+              to={"/dashboard/archive"}
+            >
+              <HiDocumentText className="text-lg" />
+              <span className="text-xs">الأرشيف</span>
+            </NavLink>
+          </div>
+          <div className="h-full">
+            <NavLink
+              className={({ isActive }) =>
+                `flex flex-col justify-center items-center h-full transition ${
+                  isActive
+                    ? "text-primary border-t-2 border-t-primary"
+                    : "text-dark"
+                }`
+              }
+              to={"/dashboard/groups"}
+            >
+              <MdGroup className="text-lg" />
+              <span className="text-xs">المجموعات</span>
+            </NavLink>
+          </div>
+          <div className="h-full">
+            <NavLink
+              className={({ isActive }) =>
+                `flex flex-col justify-center items-center h-full transition ${
+                  isActive
+                    ? "text-primary border-t-2 border-t-primary"
+                    : "text-dark"
+                }`
+              }
+              to={"/dashboard/users"}
+            >
+              <MdPerson className="text-lg" />
+              <span className="text-xs">المستخدمين</span>
+            </NavLink>
+          </div>
+        </div>
       </div>
       <MyAccount isOpen={isOpen} setIsOpen={setIsOpen} />
       <Categories isOpen={isCatOpen} setIsOpen={setIsCatOpen} />

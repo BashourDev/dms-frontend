@@ -52,7 +52,6 @@ const MyAccount = ({ isOpen, setIsOpen }) => {
       setIsUpdating(true);
       try {
         const res = await api.put("/update-current-user", values);
-        console.log(res);
         setUser(res.data);
         userContext.setUser(res.data);
         toast.success("تمت العملية بنجاح");
