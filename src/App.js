@@ -1,7 +1,13 @@
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Login from "./pages/Login";
-import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  useNavigate,
+  useLocation,
+  Navigate,
+} from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import { useEffect, useState } from "react";
 import api from "./api/api";
@@ -78,6 +84,19 @@ function App() {
               <Route path="groups" element={<Groups />} />
               <Route path="users" element={<Users />} />
             </Route>
+            <Route
+              path="*"
+              element={
+                <Navigate
+                  to={
+                    Object.keys(user).length > 0
+                      ? "/dashboard/archive"
+                      : "/login"
+                  }
+                  replace
+                />
+              }
+            />
           </Routes>
         </UserContext.Provider>
       </WindowContext.Provider>
