@@ -44,17 +44,10 @@ function App() {
   const location = useLocation();
 
   useEffect(() => {
-    // if (Object.keys(user).length === 0) {
-    //   navigate("/login");
-    //   return;
-    // }
-    // if (user?.role === 0 && location.pathname === "/") {
-    //   navigate("/dashboard/statistics");
-    // } else if (user?.role === 1 && location.pathname === "/") {
-    //   navigate("/dashboard/monitor-patients");
-    // } else if (user?.role === 2 && location.pathname === "/") {
-    //   navigate("/dashboard/monitor-hospital");
-    // }
+    if (Object.keys(user).length === 0) {
+      navigate("/login");
+      return;
+    }
   }, [user]);
 
   useEffect(() => {
@@ -86,16 +79,7 @@ function App() {
             </Route>
             <Route
               path="*"
-              element={
-                <Navigate
-                  to={
-                    Object.keys(user).length > 0
-                      ? "/dashboard/archive"
-                      : "/login"
-                  }
-                  replace
-                />
-              }
+              element={<Navigate to={"/dashboard/archive"} replace />}
             />
           </Routes>
         </UserContext.Provider>
