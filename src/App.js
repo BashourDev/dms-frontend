@@ -41,7 +41,6 @@ function App() {
 
   const [windowWidth, setWindowWidth] = useState(0);
   const navigate = useNavigate();
-  const location = useLocation();
 
   useEffect(() => {
     if (Object.keys(user).length === 0) {
