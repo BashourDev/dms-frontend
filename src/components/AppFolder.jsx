@@ -56,7 +56,7 @@ const AppFolder = ({
         <div className="flex flex-col">
           <FaFolder
             onDoubleClick={() => handleDoubleClick()}
-            className="text-7xl text-dark hover:opacity-95 peer w-20"
+            className="text-7xl text-primary hover:opacity-95 peer w-20"
           />
           <p className="text-dark text-xs md:text-sm peer-hover:opacity-95 pr-2">
             {name}

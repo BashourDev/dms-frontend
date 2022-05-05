@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
 import { FiFilePlus, FiFolderPlus } from "react-icons/fi";
-import { MdChevronRight } from "react-icons/md";
+import { MdChevronRight, MdSearch } from "react-icons/md";
 import api from "../api/api";
 import AppFile from "../components/AppFile";
 import AppFolder from "../components/AppFolder";
@@ -13,9 +13,13 @@ import FolderAdd from "../components/Modals/FolderAdd";
 import FolderEdit from "../components/Modals/FolderEdit";
 import FSEPermissions from "../components/Modals/FSEPermissions";
 import UserContext from "../contexts/userContext";
+import SearchInput from "../components/SearchInput";
+import AppButton from "../components/AppButton";
 
 const Archive = () => {
   const [archive, setArchive] = useState([]);
+  const [filteredArchive, setFilteredArchive] = useState([]);
+  const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isFileAddOpen, setIsFileAddOpen] = useState(false);
   const [isFileEditOpen, setIsFileEditOpen] = useState(false);
@@ -35,6 +39,7 @@ const Archive = () => {
     try {
       const res = await api.get(`/documents/${par}`);
       setArchive(res.data.documents);
+      setFilteredArchive(res.data.documents);
       setParent(res.data.parent);
     } catch (error) {
     } finally {
@@ -64,6 +69,30 @@ const Archive = () => {
     setIsDnDOpen(false);
   };
 
+  const filterArchive = () => {
+    if (search === "") {
+      setFilteredArchive(archive);
+    } else {
+      setFilteredArchive(() =>
+        archive.filter((a) => a.name.toLowerCase().includes(search))
+      );
+    }
+  };
+
+  const onSearchKeyPress = (e) => {
+    if (e.key === "Enter") {
+      filterArchive();
+    }
+  };
+
+  useEffect(() => {
+    filterArchive();
+  }, [search]);
+
+  useEffect(() => {
+    setFilteredArchive(archive);
+  }, [archive]);
+
   useEffect(() => {
     getDocuments();
   }, []);
@@ -74,21 +103,31 @@ const Archive = () => {
       onDragLeave={() => setIsDnDOpen(false)}
       className="w-full min-h-screen overflow-y-auto pb-20"
     >
-      <div className="flex items-center px-3 lg:px-20 py-3 bg-white border-2 w-full border-lightGray">
-        <MdChevronRight
-          onClick={() => handleGoBack()}
-          className={`transition ${
-            parent === 1 ? "text-lightGray" : "text-dark hover:text-dark/90"
-          } text-3xl mx-2 cursor-pointer`}
-        />
-        <FiFilePlus
-          onClick={() => setIsFileAddOpen(true)}
-          className="text-dark text-3xl mx-4 cursor-pointer transition hover:scale-105"
-        />{" "}
-        <FiFolderPlus
-          onClick={() => setIsFolderAddOpen(true)}
-          className="text-dark text-3xl mx-4 cursor-pointer transition hover:scale-105"
-        />
+      <div className="flex justify-between items-center px-3 lg:px-20 py-3 bg-white border-2 w-full border-lightGray">
+        <div className="flex items-center">
+          <MdChevronRight
+            onClick={() => handleGoBack()}
+            className={`transition ${
+              parent === 1 ? "text-lightGray" : "text-dark hover:text-dark/90"
+            } text-3xl mx-1 md:mx-2 cursor-pointer`}
+          />
+          <FiFilePlus
+            onClick={() => setIsFileAddOpen(true)}
+            className="text-dark text-3xl mx-2 md:mx-4 cursor-pointer transition hover:scale-105"
+          />{" "}
+          <FiFolderPlus
+            onClick={() => setIsFolderAddOpen(true)}
+            className="text-dark text-3xl mx-2 md:mx-4 cursor-pointer transition hover:scale-105"
+          />
+        </div>
+        <div className="flex w-64 md:w-72 px-1">
+          <SearchInput
+            onKeyPress={onSearchKeyPress}
+            onChange={setSearch}
+            placeholder={"بحث"}
+            Icon={MdSearch}
+          />
+        </div>
       </div>
       {isDnDOpen && (
         <div className="flex justify-center items-center pt-5">
@@ -103,10 +142,10 @@ const Archive = () => {
       <div className="flex justify-center sm:justify-start flex-wrap gap-7 lg:gap-10 px-3 lg:px-20 pt-10 pb-28 md:pb-10">
         {isLoading ? (
           <Loading />
-        ) : !archive.length ? (
+        ) : !filteredArchive.length ? (
           <span className="w-full text-center text-dark">المجلد فارغ</span>
         ) : (
-          archive.map((ar) =>
+          filteredArchive.map((ar) =>
             ar.is_directory ? (
               <AppFolder
                 key={ar.id}

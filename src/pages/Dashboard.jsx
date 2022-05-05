@@ -15,6 +15,7 @@ import Loading from "../components/Loading";
 import MyAccount from "../components/Modals/MyAccount";
 import logo from "../assets/logo.png";
 import Categories from "../components/Modals/Categories";
+import ProfileMenu from "../components/ProfileMenu";
 
 const Dashboard = () => {
   const [sideBarCollapsed, setSideBarCollapsed] = useState(false);
@@ -61,31 +62,30 @@ const Dashboard = () => {
 
   return (
     <div dir="rtl" className="flex flex-col h-screen bg-light">
-      <div className="px-6 bg-sky-700 shadow-md flex flex-col lg:flex-row items-center justify-between">
-        <div className="flex gap-3 lg:gap-5 py-2 lg:py-4">
-          <img src={logo} alt="logo" className="text-light w-8 h-8" />
-          <h1 className="text-base lg:text-lg text-light font-semibold">
-            أرشيف جامعة الحواش الخاصة
-          </h1>
+      <div className="px-2 md:px-6 bg-sky-700 shadow-md flex flex-row items-center justify-between">
+        <div className="flex w-full items-center justify-between md:justify-start gap-2 md:gap-5 py-3 lg:py-4">
+          <div className="flex gap-3 items-center">
+            <img src={logo} alt="logo" className="text-light w-8 h-8" />
+            <h1 className="text-base lg:text-lg text-light font-semibold">
+              أرشيف جامعة الحواش الخاصة
+            </h1>
+          </div>
           <button
             onClick={() => setIsCatOpen(true)}
             disabled={loading}
             className={
-              "border-light mt-0 mb-0 mx-4 text-light disabled:text-light disabled:bg-lightGray disabled:hover:bg-light disabled:hover:text-lightGray"
+              "hidden md:block border-light mt-0 mb-0 mx-4 text-light disabled:text-light disabled:bg-lightGray disabled:hover:bg-light disabled:hover:text-lightGray"
             }
           >
             {"التصنيفات"}
           </button>
-          {/* {userContext.user.role !== 0 && (
-            <div className="flex">
-              <BsChevronCompactLeft className="text-light w-6 h-8" />
-              <span className="text-base lg:text-lg text-light font-medium ">
-                {userContext?.user?.hospital?.name}
-              </span>
-            </div>
-          )} */}
+          <ProfileMenu
+            setCategoriesOpen={setIsCatOpen}
+            setMyAccountOpen={setIsOpen}
+            logout={logout}
+          />
         </div>
-        <div className="flex items-center mb-2 lg:mb-0">
+        <div className="hidden md:flex items-center mb-2 lg:mb-0">
           <AppButton
             onClick={() => setIsOpen(true)}
             disabled={loading}
@@ -146,53 +146,55 @@ const Dashboard = () => {
 
         <Outlet />
 
-        <div className="fixed bottom-0 z-20 md:hidden flex justify-around items-center w-full h-16 ring-inset ring-2 ring-lightGray/50 shadow-md bg-white">
-          <div className="h-full">
-            <NavLink
-              className={({ isActive }) =>
-                `flex flex-col justify-center items-center h-full transition ${
-                  isActive
-                    ? "text-primary border-t-2 border-t-primary"
-                    : "text-dark"
-                }`
-              }
-              to={"/dashboard/archive"}
-            >
-              <HiDocumentText className="text-lg" />
-              <span className="text-xs">الأرشيف</span>
-            </NavLink>
+        {userContext?.user?.is_admin ? (
+          <div className="fixed bottom-0 z-20 md:hidden flex justify-around items-center w-full h-16 ring-inset ring-2 ring-lightGray/50 shadow-md bg-white">
+            <div className="h-full">
+              <NavLink
+                className={({ isActive }) =>
+                  `flex flex-col justify-center items-center h-full transition ${
+                    isActive
+                      ? "text-primary border-t-2 border-t-primary"
+                      : "text-dark"
+                  }`
+                }
+                to={"/dashboard/archive"}
+              >
+                <HiDocumentText className="text-lg" />
+                <span className="text-xs">الأرشيف</span>
+              </NavLink>
+            </div>
+            <div className="h-full">
+              <NavLink
+                className={({ isActive }) =>
+                  `flex flex-col justify-center items-center h-full transition ${
+                    isActive
+                      ? "text-primary border-t-2 border-t-primary"
+                      : "text-dark"
+                  }`
+                }
+                to={"/dashboard/groups"}
+              >
+                <MdGroup className="text-lg" />
+                <span className="text-xs">المجموعات</span>
+              </NavLink>
+            </div>
+            <div className="h-full">
+              <NavLink
+                className={({ isActive }) =>
+                  `flex flex-col justify-center items-center h-full transition ${
+                    isActive
+                      ? "text-primary border-t-2 border-t-primary"
+                      : "text-dark"
+                  }`
+                }
+                to={"/dashboard/users"}
+              >
+                <MdPerson className="text-lg" />
+                <span className="text-xs">المستخدمين</span>
+              </NavLink>
+            </div>
           </div>
-          <div className="h-full">
-            <NavLink
-              className={({ isActive }) =>
-                `flex flex-col justify-center items-center h-full transition ${
-                  isActive
-                    ? "text-primary border-t-2 border-t-primary"
-                    : "text-dark"
-                }`
-              }
-              to={"/dashboard/groups"}
-            >
-              <MdGroup className="text-lg" />
-              <span className="text-xs">المجموعات</span>
-            </NavLink>
-          </div>
-          <div className="h-full">
-            <NavLink
-              className={({ isActive }) =>
-                `flex flex-col justify-center items-center h-full transition ${
-                  isActive
-                    ? "text-primary border-t-2 border-t-primary"
-                    : "text-dark"
-                }`
-              }
-              to={"/dashboard/users"}
-            >
-              <MdPerson className="text-lg" />
-              <span className="text-xs">المستخدمين</span>
-            </NavLink>
-          </div>
-        </div>
+        ) : null}
       </div>
       <MyAccount isOpen={isOpen} setIsOpen={setIsOpen} />
       <Categories isOpen={isCatOpen} setIsOpen={setIsCatOpen} />
