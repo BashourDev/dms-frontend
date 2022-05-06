@@ -1,16 +1,18 @@
 import React, { useContext } from "react";
 import { ContextMenu, ContextMenuTrigger, MenuItem } from "react-contextmenu";
 import { FaFile, FaFileArchive } from "react-icons/fa";
-import { MdDelete, MdDownload, MdEdit, MdLock } from "react-icons/md";
+import { MdClose, MdDelete, MdDownload, MdEdit, MdLock } from "react-icons/md";
 import { toast } from "react-toastify";
 import api from "../api/api";
 import { conf } from "./appConfirm";
 import FileDownload from "js-file-download";
 import UserContext from "../contexts/userContext";
+import moment from "../myMoment";
 
-const AppFile = ({
+const AppReminderFile = ({
   id,
   name,
+  dueDate,
   setFSEs,
   setSelectedFile,
   setIsEditOpen,
@@ -65,19 +67,24 @@ const AppFile = ({
     setIsPermissionsOpen(true);
   };
 
-  const handleRemind = async () => {
-    await api.post(`/users/file-system-entries/${id}/create-reminder`, {});
-    toast.success("تمت العملية بنجاح");
-  };
-
   return (
     <>
       <ContextMenuTrigger id={"" + id}>
-        <div className="flex flex-col w-20">
+        <div className="flex w-full">
           <FaFile className="text-7xl text-dark hover:opacity-95 peer" />
-          <p className="text-dark text-xs md:text-sm peer-hover:opacity-95 pr-2">
-            {name}
-          </p>
+          <div className="flex justify-between">
+            <div className="flex flex-col justify-between w-full">
+              <p className="text-dark text-xs md:text-sm peer-hover:opacity-95 pr-2">
+                {name}
+              </p>
+              <p className="text-dark/80 text-xs md:text-sm peer-hover:opacity-95 pr-2">
+                {dueDate ? moment(dueDate).calendar() : null}
+              </p>
+            </div>
+            <button>
+              <MdClose className="text-2xl" />
+            </button>
+          </div>
         </div>
       </ContextMenuTrigger>
 
@@ -110,15 +117,6 @@ const AppFile = ({
             </MenuItem>
           </>
         ) : null}
-        <MenuItem divider className="cursor-pointer bg-lightGray h-[1px]" />
-        <MenuItem
-          data={{ foo: "bar" }}
-          onClick={() => handleRemind()}
-          className="flex items-center cursor-pointer hover:bg-light px-2 py-1"
-        >
-          <MdDownload className="text-primary text-lg ml-2" />
-          <span>تذكير</span>
-        </MenuItem>
         {userContext?.user?.is_admin || permissions?.download ? (
           <>
             <MenuItem divider className="cursor-pointer bg-lightGray h-[1px]" />
@@ -159,4 +157,4 @@ const AppFile = ({
   );
 };
 
-export default AppFile;
+export default AppReminderFile;

@@ -16,6 +16,7 @@ import MyAccount from "../components/Modals/MyAccount";
 import logo from "../assets/logo.png";
 import Categories from "../components/Modals/Categories";
 import ProfileMenu from "../components/ProfileMenu";
+import Reminder from "../components/Modals/Reminder";
 
 const Dashboard = () => {
   const [sideBarCollapsed, setSideBarCollapsed] = useState(false);
@@ -23,6 +24,8 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isCatOpen, setIsCatOpen] = useState(false);
+  const [isReminderOpen, setIsReminderOpen] = useState(false);
+  const [reminderCount, setReminderCount] = useState(0);
   const userContext = useContext(UserContext);
   const windowContext = useContext(WindowContext);
   const location = useLocation();
@@ -50,6 +53,17 @@ const Dashboard = () => {
     }
   };
 
+  const getReminderCount = async () => {
+    try {
+      const res = await api.get(`/users/my-reminders-count`);
+      setReminderCount(res.data);
+    } catch (error) {}
+  };
+
+  useEffect(() => {
+    getReminderCount();
+  }, []);
+
   useEffect(() => {
     if (location.pathname.match("/dashboard/archive")) {
       setActiveItem("archive");
@@ -70,6 +84,18 @@ const Dashboard = () => {
               أرشيف جامعة الحواش الخاصة
             </h1>
           </div>
+          <button
+            onClick={() => setIsReminderOpen(true)}
+            disabled={loading}
+            className={
+              "hidden md:block relative border-light mt-0 mb-0 mx-4 text-light disabled:text-light disabled:bg-lightGray disabled:hover:bg-light disabled:hover:text-lightGray"
+            }
+          >
+            <span className="flex items-center justify-center absolute -top-3 -right-5 rounded-full text-xs shadow-sm shadow-red-500 bg-red-400 w-6 h-6">
+              {reminderCount}
+            </span>
+            {"المذكرة"}
+          </button>
           <button
             onClick={() => setIsCatOpen(true)}
             disabled={loading}
@@ -198,6 +224,11 @@ const Dashboard = () => {
       </div>
       <MyAccount isOpen={isOpen} setIsOpen={setIsOpen} />
       <Categories isOpen={isCatOpen} setIsOpen={setIsCatOpen} />
+      <Reminder
+        isOpen={isReminderOpen}
+        setIsOpen={setIsReminderOpen}
+        setReminderCount={setReminderCount}
+      />
     </div>
   );
 };
