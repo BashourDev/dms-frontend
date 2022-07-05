@@ -8,6 +8,7 @@ module.exports = {
       //old primary 8CC152
       // newer primary color 5ECD81
       // newest primary for sure 00c67f
+      hpu: "#191950",
       primary: "#2E9CCA",
       dark: "#434A54",
       lightGray: "#AAB2BD",

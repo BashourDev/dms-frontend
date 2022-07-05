@@ -57,11 +57,11 @@ const Login = () => {
 
   return (
     <div className="h-screen w-screen overflow-clip flex justify-center items-center  bg-slate-200">
-      <div className="w-full md:w-3/6 lg:w-3/12 bg-white shadow shadow-gray flex flex-col items-center relative rounded-lg">
+      <div className="w-full mx-4 md:mx-0 md:w-3/6 lg:w-3/12 bg-white shadow shadow-gray flex flex-col items-center relative rounded-lg">
         <img
           src={logo}
           alt="logo"
-          className="w-32 h-32 rounded-full absolute -top-16 border-8 border-slate-200"
+          className="w-32 h-32 rounded-full absolute -top-16 border-8 bg-slate-200 border-slate-200"
         />
 
         <h2 className="text-dark my-4 text-lg lg:text-xl mt-20">

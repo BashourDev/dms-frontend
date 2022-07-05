@@ -89,13 +89,13 @@ const CategoryForm = ({ setIsOpen }) => {
               placeholder={"ادخل الإسم"}
             />
             <div className="flex justify-around items-center py-3 gap-5">
-              <AppSubmitButton>إضافة</AppSubmitButton>
               <AppButton
                 onClick={() => setIsOpen(false)}
                 className="bg-transparent text-dark border-dark hover:bg-dark"
               >
                 إغلاق
               </AppButton>
+              <AppSubmitButton>إضافة</AppSubmitButton>
             </div>
           </>
         )}

@@ -91,9 +91,11 @@ const Dashboard = () => {
               "hidden md:block relative border-light mt-0 mb-0 mx-4 text-light disabled:text-light disabled:bg-lightGray disabled:hover:bg-light disabled:hover:text-lightGray"
             }
           >
-            <span className="flex items-center justify-center absolute -top-3 -right-5 rounded-full text-xs shadow-sm shadow-red-500 bg-red-400 w-6 h-6">
-              {reminderCount}
-            </span>
+            {reminderCount !== 0 && (
+              <span className="flex items-center justify-center absolute -top-3 -right-5 rounded-full text-xs shadow-sm shadow-red-500 bg-red-400 w-6 h-6">
+                {reminderCount}
+              </span>
+            )}
             {"المذكرة"}
           </button>
           <button
@@ -109,6 +111,8 @@ const Dashboard = () => {
             setCategoriesOpen={setIsCatOpen}
             setMyAccountOpen={setIsOpen}
             logout={logout}
+            reminderCount={reminderCount}
+            setIsReminderOpen={setIsReminderOpen}
           />
         </div>
         <div className="hidden md:flex items-center mb-2 lg:mb-0">
@@ -170,7 +174,7 @@ const Dashboard = () => {
           </ProSidebar>
         ) : null}
 
-        <Outlet />
+        <Outlet context={{ getReminderCount: getReminderCount }} />
 
         {userContext?.user?.is_admin ? (
           <div className="fixed bottom-0 z-20 md:hidden flex justify-around items-center w-full h-16 ring-inset ring-2 ring-lightGray/50 shadow-md bg-white">

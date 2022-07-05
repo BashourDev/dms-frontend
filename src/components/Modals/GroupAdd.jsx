@@ -24,11 +24,10 @@ const GroupAdd = ({ isOpen, setIsOpen, setGroups }) => {
     setIsUpdating(true);
     try {
       const res = await api.post("/groups/create", values);
-
       toast.success("تمت العملية بنجاح");
       setErrorMessage("");
       if (setGroups) {
-        setGroups((old) => [{ ...res.data }, ...old]);
+        setGroups((old) => [res.data, ...old]);
       }
     } catch (error) {
       if (error?.response?.status === 422) {

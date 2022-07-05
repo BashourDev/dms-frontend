@@ -31,7 +31,6 @@ const UserAdd = ({ isOpen, setIsOpen, setUsers }) => {
         ...values,
         is_admin: false,
       });
-
       toast.success("تمت العملية بنجاح");
       setErrorMessage("");
       if (setUsers) {

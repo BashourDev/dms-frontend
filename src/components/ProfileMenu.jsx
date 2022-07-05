@@ -10,24 +10,38 @@ export default function ProfileMenu({
   setCategoriesOpen,
   setMyAccountOpen,
   logout,
+  reminderCount,
+  setIsReminderOpen,
 }) {
   const options = [
     {
       id: 1,
+      name: "المذكرة",
+      onClick: () => {
+        setIsReminderOpen(true);
+      },
+      additional: reminderCount !== 0 && (
+        <span className="flex items-center justify-center absolute top-1 right-0 rounded-full text-white text-[10px] shadow-sm shadow-red-500 bg-red-400 w-4 h-4">
+          {reminderCount}
+        </span>
+      ),
+    },
+    {
+      id: 2,
       name: "التصنيفات",
       onClick: () => {
         setCategoriesOpen(true);
       },
     },
     {
-      id: 2,
+      id: 3,
       name: "حسابي",
       onClick: () => {
         setMyAccountOpen(true);
       },
     },
     {
-      id: 3,
+      id: 4,
       name: "تسجيل الخروج",
       onClick: () => {
         logout();
@@ -39,6 +53,11 @@ export default function ProfileMenu({
     <Menu as="div" className="relative inline-block text-left md:hidden">
       <div>
         <Menu.Button className="group inline-flex justify-center text-xs font-medium text-gray-100 hover:text-gray-200">
+          {reminderCount !== 0 && (
+            <span className="flex items-center justify-center absolute -top-1 -right-3 rounded-full text-[10px] shadow-sm shadow-red-500 bg-red-400 w-4 h-4">
+              {reminderCount}
+            </span>
+          )}
           خيارات
           <MdChevronLeft
             className="flex-shrink-0 -rotate-90 -mr-1 ml-1 h-5 w-5 text-gray-100 group-hover:text-gray-200"
@@ -71,6 +90,7 @@ export default function ProfileMenu({
                       "block px-4 py-2 text-sm w-full text-right hover:bg-gray-100"
                     )}
                   >
+                    {option?.additional}
                     {option.name}
                   </button>
                 )}

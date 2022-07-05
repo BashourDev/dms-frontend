@@ -1,7 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
-import { FiFilePlus, FiFolderPlus } from "react-icons/fi";
-import { MdChevronRight, MdSearch } from "react-icons/md";
+import { FiFilePlus, FiFolderPlus, FiHome } from "react-icons/fi";
+import {
+  MdChevronRight,
+  MdHome,
+  MdOutlineHome,
+  MdSearch,
+} from "react-icons/md";
 import api from "../api/api";
 import AppFile from "../components/AppFile";
 import AppFolder from "../components/AppFolder";
@@ -74,7 +79,12 @@ const Archive = () => {
       setFilteredArchive(archive);
     } else {
       setFilteredArchive(() =>
-        archive.filter((a) => a.name.toLowerCase().includes(search))
+        archive.filter(
+          (a) =>
+            a.name.toLowerCase().includes(search) ||
+            a?.description?.toLowerCase().includes(search) ||
+            a.tags.filter((t) => t.name.toLowerCase().includes(search)).length
+        )
       );
     }
   };
@@ -111,6 +121,10 @@ const Archive = () => {
               parent === 1 ? "text-lightGray" : "text-dark hover:text-dark/90"
             } text-3xl mx-1 md:mx-2 cursor-pointer`}
           />
+          <FiHome
+            onClick={() => getDocuments(1)}
+            className="text-dark text-3xl mx-2 md:mx-4 cursor-pointer transition hover:scale-105"
+          />
           <FiFilePlus
             onClick={() => setIsFileAddOpen(true)}
             className="text-dark text-3xl mx-2 md:mx-4 cursor-pointer transition hover:scale-105"
@@ -129,7 +143,7 @@ const Archive = () => {
           />
         </div>
       </div>
-      {isDnDOpen && (
+      {/* {isDnDOpen && (
         <div className="flex justify-center items-center pt-5">
           <FileUploader
             multiple={true}
@@ -138,8 +152,8 @@ const Archive = () => {
             label={" زتلي ياهن "}
           />
         </div>
-      )}
-      <div className="flex justify-center sm:justify-start flex-wrap gap-7 lg:gap-10 px-3 lg:px-20 pt-10 pb-28 md:pb-10">
+      )} */}
+      <div className="flex flex-wrap gap-7 lg:gap-10 px-3 lg:px-20 pt-10 pb-28 md:pb-10">
         {isLoading ? (
           <Loading />
         ) : !filteredArchive.length ? (

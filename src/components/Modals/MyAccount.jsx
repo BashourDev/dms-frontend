@@ -11,9 +11,9 @@ import AppFormSwitch from "../forms/components/AppFormSwitch";
 import AppSubmitButton from "../forms/components/AppSubmitButton";
 import { Transition } from "@headlessui/react";
 import { toast } from "react-toastify";
+import { Formik } from "formik";
 
 const validationSchema = Yup.object().shape({
-  name: Yup.string().required("لا يمكن أن يكون حقل الإسم فارغ"),
   username: Yup.string().required("لا يمكن أن يكون حقل اسم المستخدم فارغ"),
   oldPassword: Yup.string().when("updatePassword", {
     is: true,
@@ -40,7 +40,6 @@ const MyAccount = ({ isOpen, setIsOpen }) => {
   const EditAccount = () => {
     const [isUpdating, setIsUpdating] = useState(false);
     let initialValues = {
-      name: userContext.user.name,
       username: userContext.user.username,
       updatePassword: false,
       oldPassword: "",
@@ -61,69 +60,78 @@ const MyAccount = ({ isOpen, setIsOpen }) => {
         if (error?.response?.status === 422) {
           setErrorMessage("اسم المستخدم محجوز, الرجاء استخدام اسم آخر");
         }
+        if (error?.response?.status === 403) {
+          setErrorMessage("كلمة المرور الحالية غير صحيحة");
+        }
       }
       setIsUpdating(false);
     };
 
     return (
-      <AppForm
+      <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={(values) => handleSubmit(values)}
+        enableReinitialize
       >
-        {errorMessage && <span className="text-danger">{errorMessage}</span>}
-        <div className="grid grid-cols-2">
-          <AppInput
-            id={"name"}
-            placeholder={"الإسم"}
-            label={"الإسم:"}
-            containerClassName="grow"
-          />
-          <AppInput
-            id={"username"}
-            placeholder={"اسم المستخدم"}
-            label={"اسم المستخدم:"}
-            containerClassName="grow"
-          />
-        </div>
-        <div className="flex py-4">
-          <AppFormSwitch name="updatePassword" text={"تعديل كلمة المرور"} />
-        </div>
-        <AppInput
-          id={"oldPassword"}
-          placeholder={"كلمة المرور الحالية"}
-          label={"كلمة المرور الحالية:"}
-          type="password"
-          containerClassName="grow"
-          disabledValue={"updatePassword"}
-        />
-        <AppInput
-          id={"password"}
-          placeholder={"كلمة المرور الجديدة"}
-          label={"كلمة المرور الجديدة:"}
-          type="password"
-          containerClassName="grow"
-          disabledValue={"updatePassword"}
-        />
-        <AppInput
-          id={"passwordConfirmation"}
-          placeholder={"أعد كتابة كلمة المرور الجديدة"}
-          label={"تأكيد كلمة المرور الجديدة:"}
-          type="password"
-          containerClassName="grow"
-          disabledValue={"updatePassword"}
-        />
-        <div className="grid grid-cols-2 gap-10 justify-between">
-          <AppButton
-            type="button"
-            onClick={() => setIsEdit(false)}
-            className={"border-dark text-dark hover:bg-dark hover:text-white"}
-          >
-            إلغاء
-          </AppButton>
-          <AppSubmitButton isLoading={isUpdating}>تعديل</AppSubmitButton>
-        </div>
-      </AppForm>
+        {({ values }) => (
+          <>
+            {errorMessage && (
+              <span className="text-danger">{errorMessage}</span>
+            )}
+
+            <AppInput
+              id={"username"}
+              placeholder={"اسم المستخدم"}
+              label={"اسم المستخدم:"}
+              containerClassName="grow"
+            />
+            <div className="flex py-4">
+              <AppFormSwitch name="updatePassword" text={"تعديل كلمة المرور"} />
+            </div>
+            {values?.updatePassword ? (
+              <>
+                <AppInput
+                  id={"oldPassword"}
+                  placeholder={"كلمة المرور الحالية"}
+                  label={"كلمة المرور الحالية:"}
+                  type="password"
+                  containerClassName="grow"
+                  disabledValue={"updatePassword"}
+                />
+                <AppInput
+                  id={"password"}
+                  placeholder={"كلمة المرور الجديدة"}
+                  label={"كلمة المرور الجديدة:"}
+                  type="password"
+                  containerClassName="grow"
+                  disabledValue={"updatePassword"}
+                />
+                <AppInput
+                  id={"passwordConfirmation"}
+                  placeholder={"أعد كتابة كلمة المرور الجديدة"}
+                  label={"تأكيد كلمة المرور الجديدة:"}
+                  type="password"
+                  containerClassName="grow"
+                  disabledValue={"updatePassword"}
+                />
+              </>
+            ) : null}
+            <div className="grid grid-cols-2 gap-10 justify-between">
+              <AppButton
+                type="button"
+                onClick={() => setIsEdit(false)}
+                className={
+                  "border-dark text-dark hover:bg-dark hover:text-white"
+                }
+              >
+                إلغاء
+              </AppButton>
+              <AppSubmitButton isLoading={isUpdating}>تعديل</AppSubmitButton>
+            </div>
+          </>
+        )}
+      </Formik>
     );
   };
 
@@ -138,21 +146,13 @@ const MyAccount = ({ isOpen, setIsOpen }) => {
         <EditAccount />
       ) : (
         <>
-          <div className="flex mt-4">
-            <label className="ml-2">الإسم:</label>
-            <span>{userContext.user.name}</span>
-          </div>
-          <div className="flex">
+          <div className="flex mt-3">
             <label className="ml-2">اسم المستخدم:</label>
             <span>{userContext.user.username}</span>
           </div>
           <div className="flex">
             <label className="ml-2">الصلاحية:</label>
-            <span>
-              {(userContext.user.role === 0 && "مدير") ||
-                (userContext.user.role === 1 && "مسؤول مرضى المشفى") ||
-                (userContext.user.role === 2 && "مسؤول تقارير المشفى")}
-            </span>
+            <span>{userContext.user.is_admin ? "مدير" : "موظف"}</span>
           </div>
           <div className="flex mt-4 mb-1">
             <AppButton

@@ -53,8 +53,13 @@ const FolderEdit = ({ isOpen, setIsOpen, setFSEs, selectedFolder }) => {
           })
         );
       }
-    } catch (error) {}
-    setIsUpdating(false);
+    } catch (error) {
+      if (error.response.status === 403) {
+        toast.error("عذراً لا تملك صلاحية");
+      }
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   const onClose = () => {

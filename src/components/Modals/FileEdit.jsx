@@ -12,6 +12,11 @@ import { toast } from "react-toastify";
 import AppFormSelect from "../forms/components/AppFormSelect";
 import AppFileInput from "../AppFileInput";
 import { Form, Formik } from "formik";
+import AppFormTextArea from "../forms/components/AppFormTextArea";
+import AppSelectTags from "../AppSelectTags";
+import { AiOutlinePlus } from "react-icons/ai";
+import { MdCancel } from "react-icons/md";
+import Tags from "./Tags";
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required("لا يمكن أن يكون حقل الاسم فارغ"),
@@ -20,10 +25,14 @@ const validationSchema = Yup.object().shape({
 const FileEdit = ({ isOpen, setIsOpen, setFSEs, parent, selectedFile }) => {
   const [isUpdating, setIsUpdating] = useState(false);
   //   const [fileName, setFileName] = useState("");
+  const [isTagsOpen, setIsTagsOpen] = useState(false);
+  const [tags, setTags] = useState([]);
+  const [selectedTags, setSelectedTags] = useState([]);
   const [categories, setCategories] = useState([]);
   //   const [fileNameError, setFileNameError] = useState("");
   const [initialValues, setInitialValues] = useState({
     name: "",
+    description: "",
     category: { id: 0, name: "---", custom_path: "---" },
     due_date: "",
     require_approval: false,
@@ -36,6 +45,31 @@ const FileEdit = ({ isOpen, setIsOpen, setFSEs, parent, selectedFile }) => {
     setCategories(res.data);
   };
 
+  const getTags = async () => {
+    const res = await api.get("/tags");
+    setTags(res.data);
+  };
+
+  const getFSETags = async () => {
+    if (selectedFile === 0) {
+      return;
+    }
+    const res = await api.get(`/documents/${selectedFile}/tags`);
+    setSelectedTags(res.data);
+  };
+
+  const handleTagsChange = (tag) => {
+    setSelectedTags((old) => [...old, tag]);
+  };
+
+  const handleTagsRemove = (sTag) => {
+    setSelectedTags((old) => old.filter((tag) => tag.id !== sTag.id));
+  };
+
+  useEffect(() => {
+    getTags();
+  }, [isTagsOpen]);
+
   const getFile = async () => {
     if (selectedFile === 0) {
       return;
@@ -45,8 +79,8 @@ const FileEdit = ({ isOpen, setIsOpen, setFSEs, parent, selectedFile }) => {
     setInitialValues({
       ...res.data,
       require_approval: res.data.group_approval_id ? true : false,
-      category: res.data.category
-        ? res.data.category
+      category: res.data.category_full
+        ? res.data.category_full
         : { id: 0, name: "---", custom_path: "---" },
       group_approval_id: res.data.group_approval
         ? res.data.group_approval
@@ -60,6 +94,7 @@ const FileEdit = ({ isOpen, setIsOpen, setFSEs, parent, selectedFile }) => {
 
   useEffect(() => {
     getFile();
+    getFSETags();
   }, [selectedFile]);
 
   //   useEffect(() => {
@@ -111,10 +146,12 @@ const FileEdit = ({ isOpen, setIsOpen, setFSEs, parent, selectedFile }) => {
     try {
       await api.put(`/documents/${selectedFile}/update`, {
         name: values.name,
+        description: values?.description,
         category: values.category.id === 0 ? "" : values.category.id,
         due_date: values.due_date,
         group_approval_id:
           values.group_approval_id.id === 0 ? "" : values.group_approval_id.id,
+        tags: JSON.stringify(selectedTags),
         is_directory: false,
       });
       onClose();
@@ -130,6 +167,9 @@ const FileEdit = ({ isOpen, setIsOpen, setFSEs, parent, selectedFile }) => {
         );
       }
     } catch (error) {
+      if (error.response.status === 403) {
+        toast.error("عذراً لا تملك صلاحية");
+      }
     } finally {
       setIsUpdating(false);
     }
@@ -149,38 +189,77 @@ const FileEdit = ({ isOpen, setIsOpen, setFSEs, parent, selectedFile }) => {
       >
         {({ values }) => (
           <>
-            <AppFormInput
-              id={"name"}
-              placeholder={"الإسم"}
-              label={"الإسم:"}
-              containerClassName="grow"
-            />
-            <AppFormInput
-              id={"due_date"}
-              placeholder={"تاريخ الانتهاء"}
-              label={"تاريخ الانتهاء:"}
-              type="date"
-              containerClassName="grow"
-            />
-            <AppFormSelect
-              name={"category"}
-              label={"التصنيف:"}
-              options={categories}
-              displayedName={"custom_path"}
-            />
-            <div
-              className={`flex items-center w-full ${
-                values?.require_approval ? "pt-0" : " pt-5"
-              }`}
-            >
-              <AppFormSwitch name={"require_approval"} text={"طلب موافقة"} />
-              {values?.require_approval && (
-                <AppFormSelect
-                  name={"group_approval_id"}
-                  label={"من المجموعة:"}
-                  options={[]}
+            <div className="max-h-[70vh] overflow-auto">
+              <AppFormInput
+                id={"name"}
+                placeholder={"الإسم"}
+                label={"الإسم:"}
+                containerClassName="grow"
+              />
+              <AppFormTextArea
+                id={"description"}
+                placeholder={"الوصف"}
+                label={"الوصف:"}
+                containerClassName="grow"
+              />
+              <div className="grid grid-cols-6 items-center col-span-6 gap-x-1">
+                <AppSelectTags
+                  label="اختر وسم:"
+                  placeholder={"وسم الملف"}
+                  className={"col-span-5"}
+                  options={tags}
+                  handleChange={handleTagsChange}
                 />
-              )}
+                <AppButton
+                  className="col-span-1 mt-8 px-0 flex items-center justify-center"
+                  onClick={() => setIsTagsOpen(true)}
+                >
+                  {<AiOutlinePlus className="self-center text-xl" />}
+                </AppButton>
+              </div>
+              <div className="flex flex-wrap">
+                {selectedTags.map((item, i) => (
+                  <div
+                    key={i}
+                    className="bg-primary text-white h-7 rounded-full m-1 px-2 flex justify-between items-center w-fit"
+                  >
+                    <span className="flex items-center px-2 text-sm">
+                      {item?.name}
+                    </span>
+                    <MdCancel
+                      onClick={() => handleTagsRemove(item)}
+                      className="text-lg cursor-pointer"
+                    />
+                  </div>
+                ))}
+              </div>
+              <AppFormInput
+                id={"due_date"}
+                placeholder={"تاريخ المتابعة"}
+                label={"تاريخ المتابعة:"}
+                type="date"
+                containerClassName="grow"
+              />
+              <AppFormSelect
+                name={"category"}
+                label={"التصنيف:"}
+                options={categories}
+                displayedName={"custom_path"}
+              />
+              {/* <div
+                className={`flex items-center w-full ${
+                  values?.require_approval ? "pt-0" : " pt-5"
+                }`}
+              >
+                <AppFormSwitch name={"require_approval"} text={"طلب موافقة"} />
+                {values?.require_approval && (
+                  <AppFormSelect
+                    name={"group_approval_id"}
+                    label={"من المجموعة:"}
+                    options={[]}
+                  />
+                )}
+              </div> */}
             </div>
             <div className="grid grid-cols-2 gap-10 justify-between">
               <AppButton
@@ -192,11 +271,12 @@ const FileEdit = ({ isOpen, setIsOpen, setFSEs, parent, selectedFile }) => {
               >
                 إلغاء
               </AppButton>
-              <AppSubmitButton isLoading={isUpdating}>إضافة</AppSubmitButton>
+              <AppSubmitButton isLoading={isUpdating}>تعديل</AppSubmitButton>
             </div>
           </>
         )}
       </Formik>
+      <Tags isOpen={isTagsOpen} setIsOpen={setIsTagsOpen} />
     </AppModal>
   );
 };

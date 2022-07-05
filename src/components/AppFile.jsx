@@ -1,12 +1,14 @@
 import React, { useContext } from "react";
 import { ContextMenu, ContextMenuTrigger, MenuItem } from "react-contextmenu";
 import { FaFile, FaFileArchive } from "react-icons/fa";
-import { MdDelete, MdDownload, MdEdit, MdLock } from "react-icons/md";
+import { MdAlarm, MdDelete, MdDownload, MdEdit, MdLock } from "react-icons/md";
+import { BsCollectionFill } from "react-icons/bs";
 import { toast } from "react-toastify";
 import api from "../api/api";
 import { conf } from "./appConfirm";
 import FileDownload from "js-file-download";
 import UserContext from "../contexts/userContext";
+import { useOutletContext } from "react-router-dom";
 
 const AppFile = ({
   id,
@@ -21,6 +23,7 @@ const AppFile = ({
   setSelectedFilePermissions,
 }) => {
   const userContext = useContext(UserContext);
+  const { getReminderCount } = useOutletContext();
 
   const handleEdit = () => {
     setSelectedFile(id);
@@ -48,7 +51,7 @@ const AppFile = ({
     let maxMedia = Math.max(...newMedia);
     let lastMedia = media.find((m) => m.id === maxMedia);
 
-    const res = await api.get(`/documents/media/${maxMedia}/download`, {
+    const res = await api.get(`/documents/${id}/media/${maxMedia}/download`, {
       responseType: "blob",
     });
     FileDownload(res.data, lastMedia?.file_name);
@@ -66,8 +69,11 @@ const AppFile = ({
   };
 
   const handleRemind = async () => {
-    await api.post(`/users/file-system-entries/${id}/create-reminder`, {});
-    toast.success("تمت العملية بنجاح");
+    try {
+      await api.post(`/users/file-system-entries/${id}/create-reminder`, {});
+      toast.success("تمت العملية بنجاح");
+      getReminderCount();
+    } catch (error) {}
   };
 
   return (
@@ -116,7 +122,7 @@ const AppFile = ({
           onClick={() => handleRemind()}
           className="flex items-center cursor-pointer hover:bg-light px-2 py-1"
         >
-          <MdDownload className="text-primary text-lg ml-2" />
+          <MdAlarm className="text-primary text-lg ml-2" />
           <span>تذكير</span>
         </MenuItem>
         {userContext?.user?.is_admin || permissions?.download ? (
@@ -138,7 +144,7 @@ const AppFile = ({
           onClick={() => handleAllVersions()}
           className="flex items-center cursor-pointer hover:bg-light px-2 py-1"
         >
-          <FaFileArchive className="text-dark text-lg ml-2" />
+          <BsCollectionFill className="text-dark text-lg ml-2" />
           <span>جميع النسخ</span>
         </MenuItem>
         {userContext?.user?.is_admin ? (

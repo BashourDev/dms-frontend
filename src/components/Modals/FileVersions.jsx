@@ -57,9 +57,12 @@ const FileVersions = ({ isOpen, setIsOpen, selectedFile, permissions }) => {
   };
 
   const handleDownload = async (version, name) => {
-    const res = await api.get(`/documents/media/${version}/download`, {
-      responseType: "blob",
-    });
+    const res = await api.get(
+      `/documents/${selectedFile}/media/${version}/download`,
+      {
+        responseType: "blob",
+      }
+    );
     FileDownload(res.data, name);
   };
 

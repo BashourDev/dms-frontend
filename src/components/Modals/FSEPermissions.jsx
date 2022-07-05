@@ -148,6 +148,20 @@ const FSEPermissions = ({ isOpen, setIsOpen, selectedFile }) => {
     setIsOpen(false);
   };
 
+  const handleRemoveNew = (group) => {
+    setNewGroups((old) => old.filter((o) => o.group_id !== group?.group_id));
+    setAvailableGroups((old) => [
+      { id: group?.group_id, name: group?.name },
+      ...old,
+    ]);
+  };
+
+  const handleRemoveOld = (group) => {
+    setDeletedGroups((old) => [...old, group?.id]);
+    setGroups((old) => old.filter((o) => o.id !== group?.id));
+    setAvailableGroups((old) => [group, ...old]);
+  };
+
   return (
     <AppModal isOpen={isOpen} onClose={onClose} title={"صلاحيات الملف"}>
       {/* <span className="text-lg w-full">{file?.name}</span> */}
@@ -172,12 +186,18 @@ const FSEPermissions = ({ isOpen, setIsOpen, selectedFile }) => {
         {newGroups?.map((g) => (
           <div
             key={g?.group_id}
-            className="flex flex-col justify-center bg-success/20 px-2 py-2"
+            className="flex flex-col justify-center rounded-md bg-success/10 px-2 py-2"
           >
-            <span className="text-gray-900 text-sm py-1">{g?.name}</span>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-900 text-sm py-1">{g?.name}</span>
+              <MdDelete
+                className="text-danger text-lg cursor-pointer"
+                onClick={() => handleRemoveNew(g)}
+              />
+            </div>
             <div className="flex justify-between w-full">
               <div className="flex flex-col items-center text-dark text-sm">
-                <span>read</span>
+                <span>قراءة</span>
                 <AppPermissionSwitch
                   group={g?.group_id}
                   value={g?.read}
@@ -186,7 +206,7 @@ const FSEPermissions = ({ isOpen, setIsOpen, selectedFile }) => {
                 />
               </div>
               <div className="flex flex-col items-center text-dark text-sm">
-                <span>download</span>
+                <span>تحميل</span>
                 <AppPermissionSwitch
                   group={g?.group_id}
                   value={g?.download}
@@ -195,7 +215,7 @@ const FSEPermissions = ({ isOpen, setIsOpen, selectedFile }) => {
                 />
               </div>
               <div className="flex flex-col items-center text-dark text-sm">
-                <span>delete</span>
+                <span>حذف</span>
                 <AppPermissionSwitch
                   group={g?.group_id}
                   value={g?.delete}
@@ -204,7 +224,7 @@ const FSEPermissions = ({ isOpen, setIsOpen, selectedFile }) => {
                 />
               </div>
               <div className="flex flex-col items-center text-dark text-sm">
-                <span>upload</span>
+                <span>رفع</span>
                 <AppPermissionSwitch
                   group={g?.group_id}
                   value={g?.upload}
@@ -219,12 +239,18 @@ const FSEPermissions = ({ isOpen, setIsOpen, selectedFile }) => {
         {groups?.map((g) => (
           <div
             key={g?.id}
-            className="flex flex-col justify-center bg-primary/20 px-2 py-2"
+            className="flex flex-col justify-center rounded-md bg-primary/10 px-2 py-2"
           >
-            <span className="text-gray-900 text-sm py-1">{g?.name}</span>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-900 text-sm py-1">{g?.name}</span>
+              <MdDelete
+                className="text-danger text-lg cursor-pointer"
+                onClick={() => handleRemoveOld(g)}
+              />
+            </div>
             <div className="flex justify-between w-full">
               <div className="flex flex-col items-center text-dark text-sm">
-                <span>read</span>
+                <span>قراءة</span>
                 <AppPermissionSwitch
                   group={g?.id}
                   value={g?.pivot?.read}
@@ -233,7 +259,7 @@ const FSEPermissions = ({ isOpen, setIsOpen, selectedFile }) => {
                 />
               </div>
               <div className="flex flex-col items-center text-dark text-sm">
-                <span>download</span>
+                <span>تحميل</span>
                 <AppPermissionSwitch
                   group={g?.id}
                   value={g?.pivot?.download}
@@ -242,7 +268,7 @@ const FSEPermissions = ({ isOpen, setIsOpen, selectedFile }) => {
                 />
               </div>
               <div className="flex flex-col items-center text-dark text-sm">
-                <span>delete</span>
+                <span>حذف</span>
                 <AppPermissionSwitch
                   group={g?.id}
                   value={g?.pivot?.delete}
@@ -251,7 +277,7 @@ const FSEPermissions = ({ isOpen, setIsOpen, selectedFile }) => {
                 />
               </div>
               <div className="flex flex-col items-center text-dark text-sm">
-                <span>upload</span>
+                <span>رفع</span>
                 <AppPermissionSwitch
                   group={g?.id}
                   value={g?.pivot?.upload}

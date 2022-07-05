@@ -15,7 +15,7 @@ const AppButton = ({
       type={type}
       onClick={onClick}
       disabled={disabled || isLoading}
-      className={`rounded-full border-4 transition duration-100 w-full h-8 lg:h-11 mt-8 mb-1 bg-inherit text-primary hover:bg-primary hover:text-white text-xs lg:text-sm border-primary ${className}`}
+      className={`rounded-full border-4 transition duration-100 w-full h-11 mt-8 mb-1 bg-inherit text-primary hover:bg-primary hover:text-white text-xs lg:text-sm border-primary ${className}`}
     >
       {isLoading ? (
         <Loading className="w-8 h-8" />

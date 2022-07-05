@@ -45,9 +45,9 @@ const Reminder = ({ isOpen, setIsOpen, setReminderCount }) => {
 
   return (
     <AppModal isOpen={isOpen} onClose={onClose} title={"المذكرة"}>
-      <div className="flex flex-col py-5 space-y-3 max-h-[70vh] overflow-y-auto">
-        <div className="w-full min-h-screen overflow-y-auto pb-20">
-          <div className="flex justify-center sm:justify-start gap-y-7 lg:gap-y-10 px-3 lg:px-20 pt-10 pb-28 md:pb-10">
+      <div className="flex flex-col py-5 space-y-3 max-h-[60vh] overflow-y-auto">
+        <div className="w-full overflow-y-auto pb-20">
+          <div className="flex flex-col justify-center sm:justify-start w-full gap-y-7 py-5">
             {isLoading ? (
               <Loading />
             ) : !archive.length ? (
@@ -56,22 +56,25 @@ const Reminder = ({ isOpen, setIsOpen, setReminderCount }) => {
               </span>
             ) : (
               archive.map((ar) => (
-                <AppReminderFile
-                  key={ar.id}
-                  id={ar.id}
-                  name={ar.name}
-                  dueDate={ar.due_date}
-                  setFSEs={setArchive}
-                  setSelectedFile={setSelectedFile}
-                  setIsEditOpen={setIsFileEditOpen}
-                  setIsVersionsOpen={setIsVersionsOpen}
-                  setIsPermissionsOpen={setIsPermissionsOpen}
-                  media={ar?.media}
-                  permissions={
-                    !userContext?.user?.is_admin ? ar?.permissions[0] : {}
-                  }
-                  setSelectedFilePermissions={setSelectedFSEPermissions}
-                />
+                <div key={ar.id} className="flex flex-col">
+                  <AppReminderFile
+                    id={ar.id}
+                    name={ar.name}
+                    dueDate={ar.due_date}
+                    setFSEs={setArchive}
+                    setSelectedFile={setSelectedFile}
+                    setIsEditOpen={setIsFileEditOpen}
+                    setIsVersionsOpen={setIsVersionsOpen}
+                    setIsPermissionsOpen={setIsPermissionsOpen}
+                    media={ar?.media}
+                    permissions={
+                      !userContext?.user?.is_admin ? ar?.permissions[0] : {}
+                    }
+                    setSelectedFilePermissions={setSelectedFSEPermissions}
+                    setReminderCount={setReminderCount}
+                  />
+                  <div className="w-full h-0.5 my-1 bg-lightGray/50" />
+                </div>
               ))
             )}
           </div>

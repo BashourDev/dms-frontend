@@ -9,7 +9,7 @@ const api = Axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    config.headers["Authorization"] = "bearer " + getToken();
+    config.headers["Authorization"] = "Bearer " + getToken();
     return config;
   },
   (error) => {
