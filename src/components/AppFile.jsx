@@ -81,7 +81,7 @@ const AppFile = ({
       <ContextMenuTrigger id={"" + id}>
         <div className="flex flex-col w-20">
           <FaFile className="text-7xl text-dark hover:opacity-95 peer" />
-          <p className="text-dark text-xs md:text-sm peer-hover:opacity-95 pr-2">
+          <p className="text-dark text-xs md:text-sm peer-hover:opacity-95 pr-2 max-w-[90px] break-words">
             {name}
           </p>
         </div>

@@ -160,7 +160,9 @@ const Archive = () => {
           <span className="w-full text-center text-dark">المجلد فارغ</span>
         ) : (
           filteredArchive.map((ar) =>
-            ar.is_directory ? (
+            ar.is_directory === true ||
+            ar.is_directory === 1 ||
+            ar.is_directory === "1" ? (
               <AppFolder
                 key={ar.id}
                 id={ar.id}

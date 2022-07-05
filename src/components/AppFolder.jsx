@@ -58,7 +58,7 @@ const AppFolder = ({
             onDoubleClick={() => handleDoubleClick()}
             className="text-7xl text-primary hover:opacity-95 peer w-20"
           />
-          <p className="text-dark text-xs md:text-sm peer-hover:opacity-95 pr-2">
+          <p className="text-dark text-xs md:text-sm peer-hover:opacity-95 pr-2 max-w-[90px] break-words">
             {name}
           </p>
         </div>
